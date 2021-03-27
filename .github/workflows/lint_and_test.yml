@@ -14,7 +14,7 @@ jobs:
       - name: Install Terraform and Terragrunt
         run: |
           sudo apt-get install -y curl gnupg lsb-release software-properties-common
-          curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
           sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
           sudo apt-get install -y terraform
       - name: Get Versions
