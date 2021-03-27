@@ -1,0 +1,30 @@
+name: Lint and Validate Terraform Code
+
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      AWS_DEFAULT_REGION: us-west-2
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install Terraform and Terragrunt
+        run: |
+          apt install -y curl gnupg lsb-release software-properties-common
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
+          apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          apt install -y terraform
+      - name: Get Versions
+        run: |
+          terraform --version
+      - name: Terraform Init
+        run: find . -type f -name "*.tf" -exec dirname {} \;|sort -u | while read m; do (cd "$m" && terraform init -input=false -backend=false) || exit 1; done
+
+      - name: Validate Terraform configs
+        run: find . -name ".terraform" -prune -o -type f -name "*.tf" -exec dirname {} \;|sort -u | while read m; do (cd "$m" && terraform validate && echo "√ $m") || exit 1 ; done
+
+      - name: Check Terraform config formatting
+        run: terraform fmt -write=false -recursive
