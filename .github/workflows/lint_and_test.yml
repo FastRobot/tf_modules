@@ -13,10 +13,10 @@ jobs:
       - uses: actions/checkout@v1
       - name: Install Terraform and Terragrunt
         run: |
-          apt install -y curl gnupg lsb-release software-properties-common
+          sudo apt-get install -y curl gnupg lsb-release software-properties-common
           curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
-          apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-          apt install -y terraform
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get install -y terraform
       - name: Get Versions
         run: |
           terraform --version
