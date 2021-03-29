@@ -25,4 +25,7 @@ resource "aws_instance" "logstash" {
     name         = "logstash"
     elk_endpoint = module.elk.domain_endpoint
   })
+  tags = {
+    Name = "${var.namespace}-${var.environment}-logstash"
+  }
 }
