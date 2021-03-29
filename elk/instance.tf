@@ -18,6 +18,7 @@ resource "aws_instance" "logstash" {
   associate_public_ip_address = var.make_public
   key_name                    = var.aws_key_name
   instance_type               = "t2.micro"
+  iam_instance_profile        = aws_iam_instance_profile.logstash_profile.name
   security_groups             = [module.elk_sg.id]
   subnet_id                   = var.logstash_subnet
   user_data = templatefile("${path.module}/templates/user_data.sh.tpl", {
