@@ -30,7 +30,7 @@ resource "aws_iam_role" "logstash" {
 module "elk" {
   source                                                   = "git::https://github.com/cloudposse/terraform-aws-elasticsearch.git//?ref=0.30.0"
   name                                                     = "elk"
-  namespace                                                = "fr"
+  namespace                                                = var.namespace
   environment                                              = var.environment
   create_iam_service_linked_role                           = var.create_iam_service_linked_role
   dns_zone_id                                              = var.dns_zone_id
