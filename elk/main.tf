@@ -32,7 +32,7 @@ module "elk" {
   name                                                     = "elk"
   namespace                                                = "fr"
   environment                                              = var.environment
-  dns_zone_id                                              = "Z14EN2YD427LRQ"
+  dns_zone_id                                              = var.dns_zone_id
   security_groups                                          = [module.elk_sg.id]
   vpc_id                                                   = var.vpc_id
   subnet_ids                                               = [var.es_subnet_ids]
@@ -45,7 +45,7 @@ module "elk" {
   iam_role_arns                                            = [aws_iam_role.logstash.arn]
   iam_actions                                              = ["es:ESHttpGet", "es:ESHttpPut", "es:ESHttpPost"]
   encrypt_at_rest_enabled                                  = false
-  kibana_subdomain_name                                    = "kibana-es"
+  kibana_subdomain_name                                    = var.kibana_subdomain_name
   advanced_security_options_internal_user_database_enabled = true
   advanced_security_options_master_user_name               = "admin"
   advanced_security_options_master_user_password           = random_password.kibana.result
