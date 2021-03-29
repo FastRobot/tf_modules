@@ -32,6 +32,7 @@ module "elk" {
   name                                                     = "elk"
   namespace                                                = "fr"
   environment                                              = var.environment
+  create_iam_service_linked_role                           = var.create_iam_service_linked_role
   dns_zone_id                                              = var.dns_zone_id
   security_groups                                          = [module.elk_sg.id]
   vpc_id                                                   = var.vpc_id
