@@ -40,7 +40,7 @@ module "elk" {
   zone_awareness_enabled                                   = false
   availability_zone_count                                  = 1
   elasticsearch_version                                    = "7.9"
-  instance_type                                            = "t2.small.elasticsearch"
+  instance_type                                            = var.instance_type
   instance_count                                           = 1
   ebs_volume_size                                          = 10
   iam_role_arns                                            = [aws_iam_role.logstash.arn]
