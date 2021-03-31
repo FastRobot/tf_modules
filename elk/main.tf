@@ -44,7 +44,7 @@ module "elk" {
   instance_count                                           = 1
   ebs_volume_size                                          = 10
   iam_role_arns                                            = [aws_iam_role.logstash.arn]
-  iam_actions                                              = ["es:ESHttpGet", "es:ESHttpPut", "es:ESHttpPost", "es:ESHttpHead", "es:ESHttpPatch"]
+  iam_actions                                              = ["es:ESHttp*"]
   encrypt_at_rest_enabled                                  = false
   kibana_subdomain_name                                    = var.kibana_subdomain_name
   advanced_security_options_internal_user_database_enabled = true
