@@ -29,7 +29,7 @@ module "elk_sg" {
   ]
 
   name        = "logstash"
-  namespace   = "fr"
+  namespace   = var.namespace
   environment = var.environment
   vpc_id      = var.vpc_id
 }

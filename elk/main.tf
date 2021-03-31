@@ -39,12 +39,12 @@ module "elk" {
   subnet_ids                                               = [var.es_subnet_ids]
   zone_awareness_enabled                                   = false
   availability_zone_count                                  = 1
-  elasticsearch_version                                    = "7.4"
+  elasticsearch_version                                    = "7.9"
   instance_type                                            = "t2.small.elasticsearch"
   instance_count                                           = 1
   ebs_volume_size                                          = 10
   iam_role_arns                                            = [aws_iam_role.logstash.arn]
-  iam_actions                                              = ["es:ESHttpGet", "es:ESHttpPut", "es:ESHttpPost"]
+  iam_actions                                              = ["es:ESHttpGet", "es:ESHttpPut", "es:ESHttpPost", "es:ESHttpHead", "es:ESHttpPatch"]
   encrypt_at_rest_enabled                                  = false
   kibana_subdomain_name                                    = var.kibana_subdomain_name
   advanced_security_options_internal_user_database_enabled = true
