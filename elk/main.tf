@@ -42,7 +42,7 @@ module "elk" {
   elasticsearch_version                                    = "7.9"
   instance_type                                            = var.instance_type
   instance_count                                           = 1
-  ebs_volume_size                                          = 10
+  ebs_volume_size                                          = var.ebs_volume_size
   iam_role_arns                                            = [aws_iam_role.logstash.arn]
   iam_actions                                              = ["es:ESHttp*"]
   encrypt_at_rest_enabled                                  = false
