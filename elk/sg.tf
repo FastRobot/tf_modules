@@ -48,7 +48,7 @@ module "logstash_ssh_sg" {
     }
   ]
 
-  name        = "logstash"
+  name        = "logstash-ssh"
   namespace   = var.namespace
   environment = var.environment
   vpc_id      = var.vpc_id
