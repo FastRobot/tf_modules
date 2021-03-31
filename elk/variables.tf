@@ -7,6 +7,9 @@ variable "vpc_id" {}
 variable "es_subnet_ids" {}
 variable "logstash_subnet" {}
 
+variable "allow_ssh_cidr" {
+  default = ["0.0.0.0/0"]
+}
 variable "create_iam_service_linked_role" {
   type        = bool
   default     = true

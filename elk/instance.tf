@@ -19,10 +19,10 @@ resource "aws_instance" "logstash" {
   key_name                    = var.aws_key_name
   instance_type               = "t3.medium"
   iam_instance_profile        = aws_iam_instance_profile.logstash_profile.name
-  security_groups             = [module.elk_sg.id]
+  vpc_security_group_ids      = [module.elk_sg.id, module.logstash_ssh_sg.id]
   subnet_id                   = var.logstash_subnet
   lifecycle {
-    ignore_changes = [ebs_optimized, security_groups]
+    ignore_changes = [ebs_optimized]
   }
   user_data = templatefile("${path.module}/templates/user_data.sh.tpl", {
     name         = "logstash"
