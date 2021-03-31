@@ -10,7 +10,7 @@ module "elk_sg" {
       from_port   = 5044
       to_port     = 5044
       protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
+      cidr_blocks = var.allow_logstash_cidrs
     },
     {
       type        = "egress"
