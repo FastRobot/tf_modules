@@ -13,6 +13,13 @@ module "elk_sg" {
       cidr_blocks = var.allow_logstash_cidrs
     },
     {
+      type        = "ingress"
+      from_port   = 4180
+      to_port     = 4180
+      protocol    = "tcp"
+      cidr_blocks = var.allow_logstash_cidrs
+    },
+    {
       type        = "egress"
       from_port   = 0
       to_port     = 65535
