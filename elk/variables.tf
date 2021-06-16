@@ -9,12 +9,12 @@ variable "logstash_subnet" {}
 
 variable "allow_ssh_cidrs" {
   default = ["0.0.0.0/0"]
-  type    = list
+  type    = list(any)
 }
 
 variable "allow_logstash_cidrs" {
   default = ["0.0.0.0/0"]
-  type    = list
+  type    = list(any)
 }
 
 variable "create_iam_service_linked_role" {
@@ -62,4 +62,9 @@ variable "kibana_subdomain_name" {
 
 variable "master_username" {
   default = "admin"
+}
+
+variable "protect_against_termination" {
+  default     = "false"
+  description = "prevent the logstash relay instance from being deleted"
 }
