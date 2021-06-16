@@ -16,13 +16,15 @@ data "aws_ami" "ubuntu-focal" {
 resource "aws_instance" "logstash" {
   ami                         = data.aws_ami.ubuntu-focal.id
   associate_public_ip_address = var.make_public
+  disable_api_termination     = var.protect_against_termination
   key_name                    = var.aws_key_name
   instance_type               = "t3.medium"
   iam_instance_profile        = aws_iam_instance_profile.logstash_profile.name
   vpc_security_group_ids      = [module.elk_sg.id, module.logstash_ssh_sg.id]
   subnet_id                   = var.logstash_subnet
   lifecycle {
-    ignore_changes = [ebs_optimized]
+    ignore_changes        = [ebs_optimized, ami]
+    create_before_destroy = true
   }
   user_data = templatefile("${path.module}/templates/user_data.sh.tpl", {
     name         = "logstash"
