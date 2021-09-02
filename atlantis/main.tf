@@ -1,7 +1,17 @@
 
 locals {
-  # array of CIDRs
-  github_hook_cidrs = data.github_ip_ranges.gh.hooks
+  # array of CIDRs, started including ipv6 so I have to filter it out
+  github_hook_cidrs = [
+  for h in data.github_ip_ranges.gh.hooks : h if length(split(":",h)) == 1
+  ]
+}
+
+data "aws_ssm_parameter" "webhook" {
+  name = "/atlantis/webhook/secret"
+}
+
+data "aws_ssm_parameter" "token" {
+  name = "/atlantis/github/user/token"
 }
 
 module "atlantis" {
@@ -9,7 +19,7 @@ module "atlantis" {
   version = "2.42.0"
   # insert the 18 required variables here
   alb_authenticate_oidc = {
-    issuer                              = var.auth0_domain
+    issuer                              = "${var.auth0_domain}/"
     token_endpoint                      = "${var.auth0_domain}/oauth/token"
     user_info_endpoint                  = "${var.auth0_domain}/userinfo"
     authorization_endpoint              = "${var.auth0_domain}/authorize"
@@ -25,6 +35,7 @@ module "atlantis" {
   github_webhooks_cidr_blocks    = local.github_hook_cidrs
   atlantis_github_user           = var.atlantis_github_user
   atlantis_github_user_token     = var.atlantis_github_user_token
+  atlantis_github_webhook_secret = data.aws_ssm_parameter.webhook.value
   atlantis_repo_allowlist        = var.repo_allowlist
   public_subnet_ids              = var.public_subnet_ids
   private_subnet_ids             = var.private_subnet_ids

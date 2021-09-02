@@ -26,16 +26,34 @@ variable "alb_logging_enabled" {
   default     = false
 }
 
+variable "allow_repo_config" {
+  description = "When true allows the use of atlantis.yaml config files within the source repos."
+  type        = string
+  default     = "false"
+}
+
+variable "atlantis_allowed_repo_names" {
+  description = "Git repositories where webhook should be created"
+  type        = list(string)
+  default     = []
+}
+
 variable "atlantis_github_user" {}
 variable "atlantis_github_user_token" {}
+variable "atlantis_github_organization" {}
 
 variable "auth0_domain" {
-  description = "I think it's https://something.auth0.com"
+  description = "eg https://something.auth0.com, no trailing slash"
   type        = string
 }
 
 variable "auth0_client_id" {}
 variable "auth0_client_secret" {}
+
+variable "create_github_repository_webhook" {
+  default = false
+  type = bool
+}
 
 variable "environment" {
   description = "phase of lifecycle of stack, eg dev, prod"
