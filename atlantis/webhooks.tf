@@ -4,10 +4,10 @@ locals {
   webhook_secret = module.atlantis.webhook_secret
 }
 
-data github_repository "repo" {
-  for_each = toset(var.atlantis_allowed_repo_names)
-  full_name = "${var.atlantis_github_organization}/${each.key}"
-}
+//data github_repository "repo" {
+//  for_each = toset(var.atlantis_allowed_repo_names)
+//  full_name = "${var.atlantis_github_organization}/${each.key}"
+//}
 
 resource "github_repository_webhook" "this" {
   count = var.create_github_repository_webhook ? length(var.atlantis_allowed_repo_names) : 0
