@@ -55,6 +55,14 @@ variable "create_github_repository_webhook" {
   type = bool
 }
 
+variable "custom_environment_variables" {
+  default = []
+  type = list(object({
+    name = string
+    value = string
+  }))
+}
+
 variable "environment" {
   description = "phase of lifecycle of stack, eg dev, prod"
   type        = string

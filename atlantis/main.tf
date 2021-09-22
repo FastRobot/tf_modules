@@ -31,6 +31,8 @@ module "atlantis" {
   alb_ingress_cidr_blocks        = var.alb_ingress_cidr_blocks
   allow_unauthenticated_access   = true # allows for some unauthed access
   allow_github_webhooks          = true # just the github webhook ips
+  allow_repo_config              = var.allow_repo_config
+  custom_environment_variables   = var.custom_environment_variables
   ecs_fargate_spot               = true
   github_webhooks_cidr_blocks    = local.github_hook_cidrs
   atlantis_github_user           = var.atlantis_github_user
