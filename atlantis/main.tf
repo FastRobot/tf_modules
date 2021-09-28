@@ -41,6 +41,7 @@ module "atlantis" {
   atlantis_repo_allowlist        = var.repo_allowlist
   public_subnet_ids              = var.public_subnet_ids
   private_subnet_ids             = var.private_subnet_ids
+  policies_arn                   = var.policies_arn
   route53_zone_name              = var.route53_zone_name
   vpc_id                         = var.vpc_id
 }

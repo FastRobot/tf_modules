@@ -85,6 +85,11 @@ variable "private_subnet_ids" {
   type = list(string)
 }
 
+variable "policies_arn" {
+  type = list(string)
+  default = null
+}
+
 variable "repo_allowlist" {
   description = "array of repo wildcards"
   type        = list(any)
