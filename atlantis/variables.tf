@@ -42,6 +42,10 @@ variable "atlantis_github_user" {}
 variable "atlantis_github_user_token" {}
 variable "atlantis_github_organization" {}
 
+variable "atlantis_image" {
+  default = ""
+}
+
 variable "auth0_domain" {
   description = "eg https://something.auth0.com, no trailing slash"
   type        = string

@@ -16,7 +16,7 @@ locals {
 
 module "atlantis" {
   source  = "terraform-aws-modules/atlantis/aws"
-  version = "2.42.0"
+  version = "3.3.0"
   # insert the 18 required variables here
   alb_authenticate_oidc = {
     issuer                              = "${var.auth0_domain}/"
@@ -37,6 +37,7 @@ module "atlantis" {
   github_webhooks_cidr_blocks    = local.github_hook_cidrs
   atlantis_github_user           = var.atlantis_github_user
   atlantis_github_user_token     = var.atlantis_github_user_token
+  atlantis_image                 = var.atlantis_image
   #atlantis_github_webhook_secret = data.aws_ssm_parameter.webhook.value
   atlantis_repo_allowlist        = var.repo_allowlist
   public_subnet_ids              = var.public_subnet_ids
