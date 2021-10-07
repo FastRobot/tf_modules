@@ -32,7 +32,7 @@ module "atlantis" {
   version = "3.3.0"
   # insert the 18 required variables here
   atlantis_hide_prev_plan_comments = true
-  alb_authenticate_oidc          = local.uses_oidc ? local.alb_authenticate_oidc : null
+  alb_authenticate_oidc          = local.uses_oidc ? local.alb_authenticate_oidc : {}
   alb_drop_invalid_header_fields = var.alb_drop_invalid_header_fields
   alb_ingress_cidr_blocks        = var.alb_ingress_cidr_blocks
   allow_unauthenticated_access   = true # allows for some unauthed access
