@@ -4,11 +4,12 @@ locals {
   github_hook_cidrs = [
     for h in data.github_ip_ranges.gh.hooks : h if length(split(":", h)) == 1
   ]
-  uses_oidc = alltrue([
+  # https://github.com/hashicorp/terraform/issues/22405 showed me this jsonencode trick.
+  # otherwise you run afoul of Inconsistent conditional result types
+  alb_authenticate_oidc = alltrue([
     var.auth0_domain != "",
     var.auth0_client_id != "",
-  var.auth0_client_secret != ""])
-  alb_authenticate_oidc = {
+  var.auth0_client_secret != ""]) ? jsonencode({
     issuer                              = "${var.auth0_domain}/"
     token_endpoint                      = "${var.auth0_domain}/oauth/token"
     user_info_endpoint                  = "${var.auth0_domain}/userinfo"
@@ -16,7 +17,7 @@ locals {
     authentication_request_extra_params = {}
     client_id                           = var.auth0_client_id
     client_secret                       = var.auth0_client_secret # but really, get it from SSM
-  }
+  }) : jsonencode({})
 }
 
 //data "aws_ssm_parameter" "webhook" {
@@ -32,7 +33,7 @@ module "atlantis" {
   version = "3.3.0"
   # insert the 18 required variables here
   atlantis_hide_prev_plan_comments = true
-  alb_authenticate_oidc          = local.uses_oidc ? local.alb_authenticate_oidc : {}
+  alb_authenticate_oidc          = jsondecode(local.alb_authenticate_oidc)
   alb_drop_invalid_header_fields = var.alb_drop_invalid_header_fields
   alb_ingress_cidr_blocks        = var.alb_ingress_cidr_blocks
   allow_unauthenticated_access   = true # allows for some unauthed access
