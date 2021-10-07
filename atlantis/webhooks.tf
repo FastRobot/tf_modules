@@ -1,6 +1,6 @@
 
 locals {
-  webhook_url = "https://atlantis.${var.route53_zone_name}/events"
+  webhook_url    = "https://atlantis.${var.route53_zone_name}/events"
   webhook_secret = module.atlantis.webhook_secret
 }
 

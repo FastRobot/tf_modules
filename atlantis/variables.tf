@@ -49,20 +49,25 @@ variable "atlantis_image" {
 variable "auth0_domain" {
   description = "eg https://something.auth0.com, no trailing slash"
   type        = string
+  default     = null
 }
 
-variable "auth0_client_id" {}
-variable "auth0_client_secret" {}
+variable "auth0_client_id" {
+  default = null
+}
+variable "auth0_client_secret" {
+  default = null
+}
 
 variable "create_github_repository_webhook" {
   default = false
-  type = bool
+  type    = bool
 }
 
 variable "custom_environment_variables" {
   default = []
   type = list(object({
-    name = string
+    name  = string
     value = string
   }))
 }
@@ -90,7 +95,7 @@ variable "private_subnet_ids" {
 }
 
 variable "policies_arn" {
-  type = list(string)
+  type    = list(string)
   default = null
 }
 
