@@ -49,14 +49,14 @@ variable "atlantis_image" {
 variable "auth0_domain" {
   description = "eg https://something.auth0.com, no trailing slash"
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "auth0_client_id" {
-  default = null
+  default = ""
 }
 variable "auth0_client_secret" {
-  default = null
+  default = ""
 }
 
 variable "create_github_repository_webhook" {

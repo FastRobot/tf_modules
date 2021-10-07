@@ -5,9 +5,9 @@ locals {
     for h in data.github_ip_ranges.gh.hooks : h if length(split(":", h)) == 1
   ]
   uses_oidc = alltrue([
-    var.auth0_domain != null,
-    var.auth0_client_id != null,
-  var.auth0_client_secret != null])
+    var.auth0_domain != "",
+    var.auth0_client_id != "",
+  var.auth0_client_secret != ""])
   alb_authenticate_oidc = {
     issuer                              = "${var.auth0_domain}/"
     token_endpoint                      = "${var.auth0_domain}/oauth/token"
