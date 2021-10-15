@@ -77,6 +77,13 @@ variable "environment" {
   type        = string
 }
 
+# ECS Service / Task
+variable "ecs_service_assign_public_ip" {
+  description = "Should be true, if ECS service is using public subnets (more info: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_cannot_pull_image.html)"
+  type        = bool
+  default     = false
+}
+
 variable "name" {
   description = "used to name some resources, urls"
   type        = string
