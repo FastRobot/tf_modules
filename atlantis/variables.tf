@@ -84,6 +84,12 @@ variable "ecs_service_assign_public_ip" {
   default     = false
 }
 
+variable "ecs_service_platform_version" {
+  description = "The platform version on which to run your service"
+  type        = string
+  default     = "LATEST"
+}
+
 variable "name" {
   description = "used to name some resources, urls"
   type        = string
