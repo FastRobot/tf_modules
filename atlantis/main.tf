@@ -41,7 +41,7 @@ module "atlantis" {
   allow_repo_config                = var.allow_repo_config
   custom_environment_variables     = var.custom_environment_variables
   ecs_container_insights           = true
-  ecs_fargate_spot                 = true
+  ecs_fargate_spot                 = var.ecs_fargate_spot
   ecs_service_assign_public_ip     = var.ecs_service_assign_public_ip
   ecs_service_platform_version     = var.ecs_service_platform_version
   github_webhooks_cidr_blocks      = local.github_hook_cidrs

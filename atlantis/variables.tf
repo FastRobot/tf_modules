@@ -78,6 +78,10 @@ variable "environment" {
 }
 
 # ECS Service / Task
+variable "ecs_fargate_spot" {
+  default = true
+}
+
 variable "ecs_service_assign_public_ip" {
   description = "Should be true, if ECS service is using public subnets (more info: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_cannot_pull_image.html)"
   type        = bool
