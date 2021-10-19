@@ -40,6 +40,7 @@ module "atlantis" {
   allow_github_webhooks            = true # just the github webhook ips
   allow_repo_config                = var.allow_repo_config
   custom_environment_variables     = var.custom_environment_variables
+  custom_environment_secrets       = var.custom_environment_secrets
   ecs_container_insights           = true
   ecs_fargate_spot                 = var.ecs_fargate_spot
   ecs_service_assign_public_ip     = var.ecs_service_assign_public_ip

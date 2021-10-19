@@ -72,6 +72,18 @@ variable "custom_environment_variables" {
   }))
 }
 
+
+variable "custom_environment_secrets" {
+  description = "List of additional secrets the container will use (list should contain maps with `name` and `valueFrom`)"
+  type = list(object(
+  {
+    name      = string
+    valueFrom = string
+  }
+  ))
+  default = []
+}
+
 variable "environment" {
   description = "phase of lifecycle of stack, eg dev, prod"
   type        = string
