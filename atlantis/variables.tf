@@ -49,27 +49,61 @@ variable "atlantis_image" {
 variable "auth0_domain" {
   description = "eg https://something.auth0.com, no trailing slash"
   type        = string
+  default     = ""
 }
 
-variable "auth0_client_id" {}
-variable "auth0_client_secret" {}
+variable "auth0_client_id" {
+  default = ""
+}
+variable "auth0_client_secret" {
+  default = ""
+}
 
 variable "create_github_repository_webhook" {
   default = false
-  type = bool
+  type    = bool
 }
 
 variable "custom_environment_variables" {
   default = []
   type = list(object({
-    name = string
+    name  = string
     value = string
   }))
+}
+
+
+variable "custom_environment_secrets" {
+  description = "List of additional secrets the container will use (list should contain maps with `name` and `valueFrom`)"
+  type = list(object(
+  {
+    name      = string
+    valueFrom = string
+  }
+  ))
+  default = []
 }
 
 variable "environment" {
   description = "phase of lifecycle of stack, eg dev, prod"
   type        = string
+}
+
+# ECS Service / Task
+variable "ecs_fargate_spot" {
+  default = true
+}
+
+variable "ecs_service_assign_public_ip" {
+  description = "Should be true, if ECS service is using public subnets (more info: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_cannot_pull_image.html)"
+  type        = bool
+  default     = false
+}
+
+variable "ecs_service_platform_version" {
+  description = "The platform version on which to run your service"
+  type        = string
+  default     = "LATEST"
 }
 
 variable "name" {
@@ -90,7 +124,7 @@ variable "private_subnet_ids" {
 }
 
 variable "policies_arn" {
-  type = list(string)
+  type    = list(string)
   default = null
 }
 
