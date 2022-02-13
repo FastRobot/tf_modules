@@ -9,6 +9,7 @@ terraform {
 
 # Configure the GitHub Provider
 provider "github" {
-  token = var.atlantis_github_user_token
+  #token = var.atlantis_github_user_token
+  token = data.aws_ssm_parameter.token.value
   owner = var.atlantis_github_organization
 }

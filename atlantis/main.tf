@@ -24,9 +24,10 @@ locals {
 //  name = "/atlantis/webhook/secret"
 //}
 //
-//data "aws_ssm_parameter" "token" {
-//  name = "/atlantis/github/user/token"
-//}
+data "aws_ssm_parameter" "token" {
+  # -count = var.atlantis_github_user_token_name != "" ? 0 : 1
+  name = "/atlantis/github/user/token"
+}
 
 module "atlantis" {
   source  = "terraform-aws-modules/atlantis/aws"
@@ -47,7 +48,7 @@ module "atlantis" {
   ecs_service_platform_version     = var.ecs_service_platform_version
   github_webhooks_cidr_blocks      = local.github_hook_cidrs
   atlantis_github_user             = var.atlantis_github_user
-  atlantis_github_user_token       = var.atlantis_github_user_token
+  atlantis_github_user_token       = data.aws_ssm_parameter.token.value
   atlantis_image                   = var.atlantis_image
   #atlantis_github_webhook_secret = data.aws_ssm_parameter.webhook.value
   atlantis_repo_allowlist = var.repo_allowlist

@@ -39,7 +39,15 @@ variable "atlantis_allowed_repo_names" {
 }
 
 variable "atlantis_github_user" {}
-variable "atlantis_github_user_token" {}
+variable "atlantis_github_user_token" {
+  default = ""
+}
+
+variable "atlantis_github_user_token_name" {
+  default     = ""
+  description = "optional, assumes you already placed the secret there"
+}
+
 variable "atlantis_github_organization" {}
 
 variable "atlantis_image" {
@@ -76,10 +84,10 @@ variable "custom_environment_variables" {
 variable "custom_environment_secrets" {
   description = "List of additional secrets the container will use (list should contain maps with `name` and `valueFrom`)"
   type = list(object(
-  {
-    name      = string
-    valueFrom = string
-  }
+    {
+      name      = string
+      valueFrom = string
+    }
   ))
   default = []
 }
