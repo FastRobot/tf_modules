@@ -50,12 +50,12 @@ groups:
       expr: avg(rate(container_cpu_usage_seconds_total[5m]))
 EOF
   }
-  description = "A map of AMP-Ruler blocks, base64 encoded of yaml describing alerts and recording rules to create synthetic metrics"
+  description = "A map of AMP-Ruler blocks, strings of yaml describing alerts and recording rules to create synthetic metrics"
   type        = map(any)
 }
 
 variable "alerts" {
   default     = {}
-  description = "Route, inhibit, and silence alerts, base64 encoded blocks of yaml "
+  description = "Route, inhibit, and silence alerts, named map of yaml string value"
   type        = map(any)
 }
