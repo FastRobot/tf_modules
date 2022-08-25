@@ -163,15 +163,19 @@ resource "aws_iam_role_policy_attachment" "grafana-service-attach" {
 # was making a aws-sso permission set
 
 resource "aws_grafana_role_association" "aws_sso_admin_role" {
+  count = local.create_grafana_managed ? 1 : 0
   role         = "ADMIN"
-  group_ids    = [data.aws_identitystore_group.admins.group_id]
+  group_ids    = [data.aws_identitystore_group.admins[0].group_id]
   workspace_id = aws_grafana_workspace.grafana_managed[0].id
 }
 
-data "aws_ssoadmin_instances" "internal" {}
+data "aws_ssoadmin_instances" "internal" {
+  count = local.create_grafana_managed ? 1 : 0
+}
 
 data "aws_identitystore_group" "admins" {
-  identity_store_id = tolist(data.aws_ssoadmin_instances.internal.identity_store_ids)[0]
+  count = local.create_grafana_managed ? 1 : 0
+  identity_store_id = tolist(data.aws_ssoadmin_instances.internal[0].identity_store_ids)[0]
 
   filter {
     attribute_path  = "DisplayName"
@@ -191,7 +195,7 @@ data "aws_identitystore_group" "admins" {
 
 module "grafana_ecs_container_definition" {
   count            = local.create_grafana_ecs ? 1 : 0
-  source           = "cloudposse/ecs-container-definition/aws"
+  source           = "registry.terraform.io/cloudposse/ecs-container-definition/aws"
   version          = "0.58.1"
   container_name   = "${local.full_name}-grafana"
   container_image  = var.grafana_ecs_container_image
@@ -267,7 +271,7 @@ module "grafana_ecs_container_definition" {
 
 module "grafana_ecs_alb_service_task" {
   count                              = local.create_grafana_ecs ? 1 : 0
-  source                             = "cloudposse/ecs-alb-service-task/aws"
+  source                             = "registry.terraform.io/cloudposse/ecs-alb-service-task/aws"
   version                            = "0.64.0"
   namespace                          = var.namespace
   stage                              = var.environment
