@@ -28,9 +28,13 @@ locals {
 //  name = "/atlantis/github/user/token"
 //}
 
+data "aws_vpc" "atlantis" {
+  id = var.vpc_id
+}
+
 module "atlantis" {
   source  = "terraform-aws-modules/atlantis/aws"
-  version = "3.3.0"
+  version = "3.21.0"
   # insert the 18 required variables here
   atlantis_hide_prev_plan_comments = true
   alb_authenticate_oidc            = jsondecode(local.alb_authenticate_oidc)
@@ -39,12 +43,14 @@ module "atlantis" {
   allow_unauthenticated_access     = true # allows for some unauthed access
   allow_github_webhooks            = true # just the github webhook ips
   allow_repo_config                = var.allow_repo_config
+  cidr                             = data.aws_vpc.atlantis.cidr_block
   custom_environment_variables     = var.custom_environment_variables
   custom_environment_secrets       = var.custom_environment_secrets
   ecs_container_insights           = true
   ecs_fargate_spot                 = var.ecs_fargate_spot
   ecs_service_assign_public_ip     = var.ecs_service_assign_public_ip
   ecs_service_platform_version     = var.ecs_service_platform_version
+  efs_file_system_encrypted        = var.efs_file_system_encrypted
   github_webhooks_cidr_blocks      = local.github_hook_cidrs
   atlantis_github_user             = var.atlantis_github_user
   atlantis_github_user_token       = var.atlantis_github_user_token
