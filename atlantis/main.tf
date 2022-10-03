@@ -61,6 +61,7 @@ module "atlantis" {
   private_subnet_ids      = var.private_subnet_ids
   policies_arn            = var.policies_arn
   route53_zone_name       = var.route53_zone_name
+  user                    = "100:1000" # https://github.com/runatlantis/atlantis/issues/2221
   vpc_id                  = var.vpc_id
 }
 
