@@ -39,7 +39,7 @@ variable "atlantis_allowed_repo_names" {
 }
 
 variable "atlantis_github_user" {}
-variable "atlantis_github_user_token" {}
+variable "atlantis_github_user_token_ssm_path" {}
 variable "atlantis_github_organization" {}
 
 variable "atlantis_image" {
@@ -55,7 +55,7 @@ variable "auth0_domain" {
 variable "auth0_client_id" {
   default = ""
 }
-variable "auth0_client_secret" {
+variable "auth0_client_secret_ssm_path" {
   default = ""
 }
 

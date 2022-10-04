@@ -9,24 +9,28 @@ locals {
   alb_authenticate_oidc = alltrue([
     var.auth0_domain != "",
     var.auth0_client_id != "",
-    var.auth0_client_secret != ""]) ? jsonencode({
+    var.auth0_client_secret_ssm_path != ""]) ? jsonencode({
     issuer                              = "${var.auth0_domain}/"
     token_endpoint                      = "${var.auth0_domain}/oauth/token"
     user_info_endpoint                  = "${var.auth0_domain}/userinfo"
     authorization_endpoint              = "${var.auth0_domain}/authorize"
     authentication_request_extra_params = {}
     client_id                           = var.auth0_client_id
-    client_secret                       = var.auth0_client_secret # but really, get it from SSM
+    client_secret                       = data.aws_ssm_parameter.auth0_client_secret.value
   }) : jsonencode({})
+}
+
+data "aws_ssm_parameter" "auth0_client_secret" {
+  name = "/atlantis/auth0_client_secret/token"
 }
 
 //data "aws_ssm_parameter" "webhook" {
 //  name = "/atlantis/webhook/secret"
 //}
-//
-//data "aws_ssm_parameter" "token" {
-//  name = "/atlantis/github/user/token"
-//}
+
+data "aws_ssm_parameter" "github_token" {
+  name = var.atlantis_github_user_token_ssm_path
+}
 
 data "aws_vpc" "atlantis" {
   id = var.vpc_id
@@ -53,7 +57,7 @@ module "atlantis" {
   efs_file_system_encrypted        = var.efs_file_system_encrypted
   github_webhooks_cidr_blocks      = local.github_hook_cidrs
   atlantis_github_user             = var.atlantis_github_user
-  atlantis_github_user_token       = var.atlantis_github_user_token
+  atlantis_github_user_token       = data.aws_ssm_parameter.github_token.value
   atlantis_image                   = var.atlantis_image
   #atlantis_github_webhook_secret = data.aws_ssm_parameter.webhook.value
   atlantis_repo_allowlist = var.repo_allowlist
