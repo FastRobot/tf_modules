@@ -39,7 +39,7 @@ variable "atlantis_allowed_repo_names" {
 }
 
 variable "atlantis_github_user" {}
-variable "atlantis_github_user_token" {}
+variable "atlantis_github_user_token_ssm_path" {}
 variable "atlantis_github_organization" {}
 
 variable "atlantis_image" {
@@ -55,7 +55,7 @@ variable "auth0_domain" {
 variable "auth0_client_id" {
   default = ""
 }
-variable "auth0_client_secret" {
+variable "auth0_client_secret_ssm_path" {
   default = ""
 }
 
@@ -76,12 +76,17 @@ variable "custom_environment_variables" {
 variable "custom_environment_secrets" {
   description = "List of additional secrets the container will use (list should contain maps with `name` and `valueFrom`)"
   type = list(object(
-  {
-    name      = string
-    valueFrom = string
-  }
+    {
+      name      = string
+      valueFrom = string
+    }
   ))
   default = []
+}
+
+variable "efs_file_system_encrypted" {
+  type    = bool
+  default = false
 }
 
 variable "environment" {
