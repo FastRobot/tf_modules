@@ -16,12 +16,13 @@ locals {
     authorization_endpoint              = "${var.auth0_domain}/authorize"
     authentication_request_extra_params = {}
     client_id                           = var.auth0_client_id
-    client_secret                       = data.aws_ssm_parameter.auth0_client_secret.value
+    client_secret                       = data.aws_ssm_parameter.auth0_client_secret[0].value
   }) : jsonencode({})
 }
 
 data "aws_ssm_parameter" "auth0_client_secret" {
-  name = "/atlantis/auth0_client_secret/token"
+  count = var.auth0_client_secret_ssm_path != "" ? 1 : 0
+  name = var.auth0_client_secret_ssm_path
 }
 
 //data "aws_ssm_parameter" "webhook" {
