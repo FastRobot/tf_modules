@@ -39,7 +39,7 @@ data "aws_vpc" "atlantis" {
 
 module "atlantis" {
   source  = "terraform-aws-modules/atlantis/aws"
-  version = "3.21.0"
+  version = "3.28.0"
   # insert the 18 required variables here
   atlantis_hide_prev_plan_comments = true
   alb_authenticate_oidc            = jsondecode(local.alb_authenticate_oidc)
