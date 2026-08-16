@@ -26,7 +26,7 @@ output "project_id" {
 }
 
 output "initial_passwords" {
-  description = "Bootstrap password per user key. Generated randomly unless overridden via var.initial_passwords. Retrieve once for first login; the account is expected to move to a passkey afterward."
-  value       = { for k, v in random_password.initial : k => v.result }
+  description = "The bootstrap password actually set on each user's account (the var.initial_passwords override when given, otherwise the generated random password). Retrieve once for first login; the account is expected to move to a passkey afterward."
+  value       = local.effective_passwords
   sensitive   = true
 }

@@ -14,11 +14,15 @@ any OIDC relying party.
 
 * `is_email_verified` can only be true when a password is set. By default the
   bootstrap password is randomly generated per user (`random_password`); set
-  `initial_passwords[key]` only to override it for a specific user.
-* The generated bootstrap password is retrievable once via
-  `terragrunt output -json initial_passwords`. It's a throwaway credential —
-  the expectation is you log in once, then enroll a passkey, after which the
-  password is no longer needed.
+  `initial_passwords[key]` only to override it for a specific user. A single
+  `local.effective_passwords` expression decides the actual password set on
+  the account *and* is what the `initial_passwords` output returns, so the
+  two can never diverge — no random password is even generated for a user
+  whose key is present in `var.initial_passwords`.
+* The bootstrap password actually set on the account (override or generated)
+  is retrievable once via `terragrunt output -json initial_passwords`. It's a
+  throwaway credential — the expectation is you log in once, then enroll a
+  passkey, after which the password is no longer needed.
 * `initial_skip_password_change` is set to `true`. Without it the user is
   forced through a password-change screen on first login, which breaks
   relying-party enrollment redirects.

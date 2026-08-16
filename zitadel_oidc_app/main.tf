@@ -21,8 +21,27 @@ resource "zitadel_application_oidc" "this" {
   dev_mode = false
 }
 
+locals {
+  # Single source of truth for each user's bootstrap password: an explicit
+  # override from var.initial_passwords when present, otherwise the random
+  # password generated below. Both zitadel_human_user and the
+  # initial_passwords output read from this local so they can never diverge.
+  effective_passwords = {
+    for k, _ in var.users : k => try(var.initial_passwords[k], random_password.initial[k].result)
+  }
+}
+
 resource "random_password" "initial" {
-  for_each = var.users
+  # Skip generating (and storing in state) a password for any user whose
+  # password comes from var.initial_passwords instead — it would otherwise
+  # sit in state unused. try() in local.effective_passwords short-circuits
+  # before referencing random_password.initial[k] for those keys.
+  #
+  # nonsensitive() here only strips sensitivity from the *keys* of
+  # var.initial_passwords (short user identifiers, e.g. "lamont") for use in
+  # for_each, which Terraform otherwise refuses on a sensitive-derived value
+  # even though only the map's values, not its keys, are actually secret.
+  for_each = { for k, v in var.users : k => v if !contains(nonsensitive(keys(var.initial_passwords)), k) }
 
   length           = 32
   special          = true
@@ -39,9 +58,9 @@ resource "zitadel_human_user" "this" {
   last_name  = each.value.last_name
 
   # is_email_verified can only be true when a password is set, and Tailscale
-  # requires a verified email claim. var.initial_passwords is an optional
-  # override; absent an entry, a random password is generated instead.
-  initial_password  = try(var.initial_passwords[each.key], random_password.initial[each.key].result)
+  # requires a verified email claim. See local.effective_passwords for the
+  # override-vs-generated logic.
+  initial_password  = local.effective_passwords[each.key]
   is_email_verified = true
 
   # Without this the user hits a forced password-change screen on first login,
