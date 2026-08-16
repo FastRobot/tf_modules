@@ -66,6 +66,19 @@ resource "zitadel_human_user" "this" {
   # Without this the user hits a forced password-change screen on first login,
   # which would land inside Tailscale's one-shot signup redirect and break it.
   initial_skip_password_change = true
+
+  lifecycle {
+    precondition {
+      # The provider docs claim org_id falls back to the service account's
+      # organization when omitted — that's true for the v1-API resources
+      # (zitadel_project, zitadel_application_oidc) but NOT for
+      # zitadel_human_user, which uses the user/v2 API. Omitting org_id here
+      # sends an empty string and ZITADEL rejects it with a gRPC
+      # InvalidArgument at apply time. Fail immediately instead.
+      condition     = var.org_id != null && var.org_id != ""
+      error_message = "org_id must be set when var.users is non-empty: the ZITADEL user/v2 API requires an explicit organization ID and does not fall back to the service account's organization."
+    }
+  }
 }
 
 resource "zitadel_user_grant" "this" {

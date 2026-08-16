@@ -32,6 +32,18 @@ any OIDC relying party.
   not initialise passwordless setup. Enroll manually after first login.
 * `zitadel_human_user.initial_password` is a write-only provider attribute,
   which requires Terraform >= 1.11.
+* **`org_id` is effectively required whenever `var.users` is non-empty, despite
+  the provider docs.** The docs for `zitadel_human_user` say `org_id` falls back
+  to the authenticated service account's organization when omitted — that claim
+  is only true for the v1-API resources (`zitadel_project`,
+  `zitadel_application_oidc`). `zitadel_human_user` uses the user/v2 API, which
+  sends an empty string instead of resolving a fallback, and ZITADEL rejects it
+  with a gRPC `InvalidArgument` (`invalid CreateUserRequest.OrganizationId:
+  value length must be between 1 and 200 runes, inclusive`) — at apply time,
+  after the project and app have already been created. A `lifecycle
+  precondition` on `zitadel_human_user` now fails fast with a clear message
+  instead of that cryptic gRPC error; set `var.org_id` explicitly any time
+  you're also passing `var.users`.
 
 ## Usage
 

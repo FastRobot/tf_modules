@@ -1,5 +1,5 @@
 variable "org_id" {
-  description = "ZITADEL organization ID. When null, the organization of the authenticated service user is used."
+  description = "ZITADEL organization ID. When null, zitadel_project and zitadel_application_oidc (the v1-API resources) fall back to the authenticated service account's organization, but zitadel_human_user (the v2-API resource) does not — it requires org_id explicitly whenever var.users is non-empty. See the module README."
   type        = string
   default     = null
 }
