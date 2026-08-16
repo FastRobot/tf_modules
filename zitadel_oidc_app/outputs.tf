@@ -24,3 +24,9 @@ output "project_id" {
   description = "ID of the created ZITADEL project."
   value       = zitadel_project.this.id
 }
+
+output "initial_passwords" {
+  description = "Bootstrap password per user key. Generated randomly unless overridden via var.initial_passwords. Retrieve once for first login; the account is expected to move to a passkey afterward."
+  value       = { for k, v in random_password.initial : k => v.result }
+  sensitive   = true
+}

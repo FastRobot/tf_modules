@@ -21,6 +21,14 @@ resource "zitadel_application_oidc" "this" {
   dev_mode = false
 }
 
+resource "random_password" "initial" {
+  for_each = var.users
+
+  length           = 32
+  special          = true
+  override_special = "!@#$%^&*()-_=+"
+}
+
 resource "zitadel_human_user" "this" {
   for_each = var.users
 
@@ -31,8 +39,9 @@ resource "zitadel_human_user" "this" {
   last_name  = each.value.last_name
 
   # is_email_verified can only be true when a password is set, and Tailscale
-  # requires a verified email claim.
-  initial_password  = var.initial_passwords[each.key]
+  # requires a verified email claim. var.initial_passwords is an optional
+  # override; absent an entry, a random password is generated instead.
+  initial_password  = try(var.initial_passwords[each.key], random_password.initial[each.key].result)
   is_email_verified = true
 
   # Without this the user hits a forced password-change screen on first login,

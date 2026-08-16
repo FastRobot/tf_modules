@@ -30,7 +30,7 @@ variable "users" {
 }
 
 variable "initial_passwords" {
-  description = "Bootstrap password per user key, matching the keys of var.users. Write-only in the provider and never persisted to Terraform state. Required because is_email_verified can only be true when a password is set."
+  description = "Optional bootstrap password override per user key, matching the keys of var.users. When a key is absent, a random password is generated instead, since is_email_verified can only be true when a password is set."
   type        = map(string)
   sensitive   = true
   default     = {}
