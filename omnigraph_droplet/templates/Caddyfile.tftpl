@@ -1,0 +1,32 @@
+# Managed by terraform (tf_modules//omnigraph_droplet). Only cloudflared
+# reaches these listeners; neither port is published on the host.
+{
+	admin off
+	auto_https off
+}
+
+# Browser hostname. Cloudflare Access has already logged the user in with
+# Google; swap their email for their OmniGraph actor's bearer token, so the
+# server attributes and authorizes every request to that actor. Whatever
+# Authorization header the browser sent is replaced.
+:8081 {
+	map {http.request.header.Cf-Access-Authenticated-User-Email} {omnigraph_token} {
+%{ for email, token in user_tokens ~}
+		${email} ${token}
+%{ endfor ~}
+		default ""
+	}
+
+	@unmapped vars {omnigraph_token} ""
+	respond @unmapped "No OmniGraph actor for this Access user" 403
+
+	request_header Authorization "Bearer {omnigraph_token}"
+	reverse_proxy omnigraph:8080
+}
+
+# API hostname. Access admitted a service token; the client sends its own
+# OmniGraph bearer token, which passes through unchanged.
+:8082 {
+	request_header -Cf-Access-Authenticated-User-Email
+	reverse_proxy omnigraph:8080
+}

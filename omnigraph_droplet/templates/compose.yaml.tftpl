@@ -1,0 +1,35 @@
+# Managed by terraform (tf_modules//omnigraph_droplet).
+#
+# The omnigraph service is in the "serve" profile so a fresh droplet does not
+# start it before the cluster root has been bootstrapped. After bootstrap:
+#   cd /etc/omnigraph && docker compose --profile serve up -d
+name: omnigraph
+
+services:
+  omnigraph:
+    image: ${omnigraph_image}
+    profiles: [serve]
+    restart: unless-stopped
+    # The server drains for OMNIGRAPH_SHUTDOWN_GRACE_SECONDS after SIGTERM;
+    # Docker must wait longer than that, or the cut-off is a crash.
+    stop_grace_period: 40s
+    environment:
+      OMNIGRAPH_CLUSTER: /var/lib/omnigraph/cluster
+      OMNIGRAPH_SERVER_BEARER_TOKENS_FILE: /run/omnigraph/tokens.json
+      OMNIGRAPH_SHUTDOWN_GRACE_SECONDS: "25"
+    volumes:
+      - /mnt/omnigraph/cluster:/var/lib/omnigraph/cluster
+      - /etc/omnigraph/tokens.json:/run/omnigraph/tokens.json:ro
+
+  caddy:
+    image: ${caddy_image}
+    restart: unless-stopped
+    volumes:
+      - /etc/omnigraph/Caddyfile:/etc/caddy/Caddyfile:ro
+
+  cloudflared:
+    image: ${cloudflared_image}
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    env_file: /etc/omnigraph/cloudflared.env
+    depends_on: [caddy]

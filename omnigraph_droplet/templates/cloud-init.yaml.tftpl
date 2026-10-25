@@ -1,0 +1,63 @@
+#cloud-config
+# Managed by terraform (tf_modules//omnigraph_droplet). Seeds a new droplet
+# only; see the module README for pushing later config changes.
+hostname: ${hostname}
+package_update: true
+package_upgrade: true
+packages:
+  - docker.io
+  - docker-compose-v2
+
+swap:
+  filename: /swapfile
+  size: 2G
+
+write_files:
+  - path: /etc/omnigraph/compose.yaml
+    permissions: "0644"
+    content: |
+      ${indent(6, compose)}
+  - path: /etc/omnigraph/Caddyfile
+    permissions: "0644"
+    content: |
+      ${indent(6, caddyfile)}
+  - path: /etc/omnigraph/tokens.json
+    permissions: "0600"
+    content: |
+      ${tokens_json}
+  - path: /etc/omnigraph/cloudflared.env
+    permissions: "0600"
+    content: |
+      TUNNEL_TOKEN=${tunnel_token}
+  - path: /usr/local/bin/og
+    permissions: "0755"
+    content: |
+      #!/bin/sh
+      # Run the omnigraph CLI against the local cluster root, which is
+      # mounted at /var/lib/omnigraph/cluster. The current directory is
+      # mounted read-only at /work, for cluster bundles:
+      #   og cluster apply --target /var/lib/omnigraph/cluster --config /work/my-bundle --as act-lamont --json
+      exec docker run --rm -i \
+        -v /mnt/omnigraph/cluster:/var/lib/omnigraph/cluster \
+        -v "$PWD":/work:ro \
+        --entrypoint /usr/local/bin/omnigraph \
+        ${omnigraph_image} "$@"
+
+runcmd:
+  - [sh, -c, 'mkdir -p /mnt/omnigraph']
+  - [sh, -c, 'echo "/dev/disk/by-id/scsi-0DO_Volume_${volume_name} /mnt/omnigraph ext4 defaults,nofail,discard,noatime 0 2" >> /etc/fstab']
+  - [sh, -c, 'mount /mnt/omnigraph']
+  - [systemctl, enable, --now, docker]
+%{ if registry_auth != null ~}
+  - [sh, -c, 'printf %s "${registry_auth.password}" | docker login ${registry_auth.server} -u "${registry_auth.username}" --password-stdin']
+%{ endif ~}
+  # The cluster root and the token file must be readable by the image's
+  # non-root omnigraph user.
+  - [sh, -c, 'docker pull ${omnigraph_image} && uid=$(docker run --rm --entrypoint id ${omnigraph_image} -u) && gid=$(docker run --rm --entrypoint id ${omnigraph_image} -g) && mkdir -p /mnt/omnigraph/cluster && chown "$uid:$gid" /mnt/omnigraph/cluster /etc/omnigraph/tokens.json']
+  - [sh, -c, 'cd /etc/omnigraph && docker compose up -d']
+%{ if tailscale_auth_key != null ~}
+  - [sh, -c, 'curl -fsSL https://tailscale.com/install.sh | sh']
+  - [sh, -c, 'tailscale up --ssh --auth-key="${tailscale_auth_key}" --advertise-tags="${tailscale_tags}" --hostname="${hostname}"']
+%{ endif ~}
+  # Once the cluster root holds an applied cluster, start the server too.
+  - [sh, -c, 'if [ -n "$(ls -A /mnt/omnigraph/cluster)" ]; then cd /etc/omnigraph && docker compose --profile serve up -d; fi']
