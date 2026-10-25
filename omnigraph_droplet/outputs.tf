@@ -42,3 +42,8 @@ output "caddyfile" {
   sensitive   = true
   value       = local.caddyfile
 }
+
+output "compose" {
+  description = "Rendered /etc/omnigraph/compose.yaml. user_data is only read at first boot; push changes with: terragrunt output -raw compose | ssh root@<droplet> 'cat > /etc/omnigraph/compose.yaml && cd /etc/omnigraph && docker compose --profile serve up -d'"
+  value       = local.compose
+}

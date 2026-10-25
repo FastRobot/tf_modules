@@ -63,6 +63,27 @@ resource "cloudflare_zero_trust_access_application" "browser" {
     id         = cloudflare_zero_trust_access_policy.users.id
     precedence = 1
   }]
+
+  # Managed OAuth: Access acts as an OAuth 2.1 authorization server for this
+  # hostname, so MCP clients and the CLI credential helper (non-browser) get a
+  # 401 + discovery instead of a login redirect, sign in with Google, and send
+  # Access's opaque token on each request. The origin then sees the same
+  # identity as a browser login, and Caddy maps it to an OmniGraph token.
+  # cloudflared validates the Access JWT (origin_request.access below), which
+  # Cloudflare requires before enabling this.
+  oauth_configuration = {
+    enabled = true
+    dynamic_client_registration = {
+      enabled                = true
+      allow_any_on_localhost = true
+      allow_any_on_loopback  = true
+      allowed_uris           = var.oauth_redirect_uris
+    }
+    grant = {
+      access_token_lifetime = var.oauth_access_token_lifetime
+      session_duration      = var.oauth_session_duration
+    }
+  }
 }
 
 # --- service clients: Access service tokens ---------------------------------

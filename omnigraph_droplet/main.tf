@@ -29,6 +29,9 @@ locals {
     omnigraph_image   = var.omnigraph_image
     caddy_image       = var.caddy_image
     cloudflared_image = var.cloudflared_image
+    mcp_allowed_hosts = join(",", compact([var.hostname, var.api_hostname]))
+    mcp_allow_writes  = var.mcp_allow_writes
+    mcp_allow_adhoc   = var.mcp_allow_adhoc
   })
 
   user_data = templatefile("${path.module}/templates/cloud-init.yaml.tftpl", {

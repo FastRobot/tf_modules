@@ -139,3 +139,35 @@ variable "service_clients" {
   type        = map(string)
   default     = {}
 }
+
+# --- MCP and OAuth ----------------------------------------------------------
+
+variable "oauth_redirect_uris" {
+  description = "HTTPS redirect URIs (may end in /*) that dynamically registered OAuth clients may use, besides localhost/127.0.0.1. The default admits Claude.ai custom connectors."
+  type        = list(string)
+  default     = ["https://claude.ai/api/mcp/auth_callback"]
+}
+
+variable "oauth_access_token_lifetime" {
+  description = "Lifetime of Access-issued OAuth access tokens; clients refresh silently."
+  type        = string
+  default     = "15m"
+}
+
+variable "oauth_session_duration" {
+  description = "Lifetime of the OAuth grant (refresh token) before Google sign-in is needed again."
+  type        = string
+  default     = "336h"
+}
+
+variable "mcp_allow_writes" {
+  description = "Enable the server's MCP write tools (mutate, load, branches). Cedar policy still decides each call."
+  type        = bool
+  default     = false
+}
+
+variable "mcp_allow_adhoc" {
+  description = "Enable the MCP ad-hoc GQ read tool."
+  type        = bool
+  default     = false
+}

@@ -17,6 +17,15 @@ services:
       OMNIGRAPH_CLUSTER: /var/lib/omnigraph/cluster
       OMNIGRAPH_SERVER_BEARER_TOKENS_FILE: /run/omnigraph/tokens.json
       OMNIGRAPH_SHUTDOWN_GRACE_SECONDS: "25"
+      # /mcp is reached through Caddy under the public hostnames; the MCP SDK
+      # refuses Host values it was not told about.
+      OMNIGRAPH_MCP_ALLOWED_HOSTS: "${mcp_allowed_hosts}"
+%{ if mcp_allow_writes ~}
+      OMNIGRAPH_MCP_ALLOW_WRITES: "1"
+%{ endif ~}
+%{ if mcp_allow_adhoc ~}
+      OMNIGRAPH_MCP_ALLOW_ADHOC: "1"
+%{ endif ~}
     volumes:
       - /mnt/omnigraph/cluster:/var/lib/omnigraph/cluster
       - /etc/omnigraph/tokens.json:/run/omnigraph/tokens.json:ro
