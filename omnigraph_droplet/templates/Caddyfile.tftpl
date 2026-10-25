@@ -10,6 +10,13 @@
 # server attributes and authorizes every request to that actor. Whatever
 # Authorization header the browser sent is replaced.
 :8081 {
+	# OmniGraph 0.14 serves MCP 2026-07-28 list results without the required
+	# ttlMs/cacheScope hints, which strict clients (Claude Code) reject. Refuse
+	# the 2026 discovery request so clients fall back to the 2025-11-25
+	# handshake. Remove once the server emits the hints.
+	@mcp_discover header Mcp-Method server/discover
+	respond @mcp_discover `{"jsonrpc":"2.0","id":null,"error":{"code":-32601,"message":"Method not found"}}` 400
+
 	map {http.request.header.Cf-Access-Authenticated-User-Email} {omnigraph_token} {
 %{ for email, token in user_tokens ~}
 		${email} ${token}
@@ -27,6 +34,13 @@
 # API hostname. Access admitted a service token; the client sends its own
 # OmniGraph bearer token, which passes through unchanged.
 :8082 {
+	# OmniGraph 0.14 serves MCP 2026-07-28 list results without the required
+	# ttlMs/cacheScope hints, which strict clients (Claude Code) reject. Refuse
+	# the 2026 discovery request so clients fall back to the 2025-11-25
+	# handshake. Remove once the server emits the hints.
+	@mcp_discover header Mcp-Method server/discover
+	respond @mcp_discover `{"jsonrpc":"2.0","id":null,"error":{"code":-32601,"message":"Method not found"}}` 400
+
 	request_header -Cf-Access-Authenticated-User-Email
 	reverse_proxy omnigraph:8080
 }
