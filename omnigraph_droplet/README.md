@@ -5,8 +5,8 @@ DigitalOcean droplet, published through a Cloudflare Tunnel behind Cloudflare
 Access with Google login.
 
 ```
-browser ── Access (Google, explicit emails) ── tunnel ── cloudflared ── caddy:8081 ── omnigraph:8080
-client  ── Access (service token)           ── tunnel ── cloudflared ── caddy:8082 ── omnigraph:8080
+browser, MCP, og-cf-proxy (oauth)   ── Access (Google, explicit emails) ── tunnel ── cloudflared ── caddy:8081 ── omnigraph:8080
+CI, og-cf-proxy (service)           ── Access (service token)           ── tunnel ── cloudflared ── caddy:8082 ── omnigraph:8080
 ```
 
 * The droplet takes no inbound traffic except optional SSH (`ssh_source_addresses`)
@@ -51,6 +51,53 @@ cd /etc/omnigraph && docker compose --profile serve up -d
 Later schema, query and policy changes go to the running server
 (`omnigraph cluster apply --target <server target>`), not through `og`, because
 direct writes need the server stopped.
+
+## CLI and CI access: `tools/og-cf-proxy`
+
+The omnigraph CLI cannot pass Cloudflare Access. It sends only a token68
+bearer token, so it can't carry an Access OAuth token (`oauth:...`) or the
+service-token headers. It does allow plain HTTP to an *anonymous loopback*
+server. `tools/og-cf-proxy` (Python 3, stdlib only) listens on
+`127.0.0.1:8787` and adds the credentials on the way out:
+
+| Mode | Selected by | Upstream | Identity |
+|---|---|---|---|
+| oauth | default | `https://<hostname>` | Google login via Access Managed OAuth; Caddy maps the email to the actor |
+| service | `CF_ACCESS_CLIENT_ID`, `CF_ACCESS_CLIENT_SECRET`, `OMNIGRAPH_TOKEN` set | `https://<api_hostname>` | the client's bearer token (`service_clients`) |
+
+Workstation setup:
+
+```bash
+export OG_CF_UPSTREAM=https://<hostname>
+og-cf-proxy login        # once; browser sign-in, refresh token kept in the macOS keychain
+cat > ~/.omnigraph/config.yaml <<'YAML'
+version: 1
+targets:
+  mine:
+    kind: server
+    endpoint: http://127.0.0.1:8787
+    auth: {provider: anonymous}
+    default_graph: <graph>
+defaults:
+  target: mine
+YAML
+og-cf-proxy exec -- omnigraph access --json     # or keep `og-cf-proxy serve` running
+```
+
+`exec` starts the proxy for one command, or reuses one already listening
+with the same upstream. Access tokens last `oauth_access_token_lifetime`;
+the proxy refreshes them, and a new `login` is needed after
+`oauth_session_duration`. While the proxy runs, any local process that can
+reach the port acts as you.
+
+For CI, give the job a `service_clients` entry and its three values as
+secrets, then run `og-cf-proxy exec -- omnigraph cluster apply --config ...`
+with `OG_CF_UPSTREAM=https://<api_hostname>`. The client's actor needs
+`config_manage` (cluster policy) plus `schema_apply` and `read` on each
+graph whose schema changes.
+
+MCP clients need no proxy. They discover Access Managed OAuth from the 401
+on `https://<hostname>/mcp`.
 
 ## Changing users, clients or tokens
 
