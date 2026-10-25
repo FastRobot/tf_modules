@@ -35,9 +35,12 @@ cloudflared. Bootstrap once from a cluster bundle (`cluster.yaml`, schema,
 policies). The policy must grant the actors in `users`/`service_clients`.
 
 ```bash
-scp -r ./my-bundle root@<droplet>:/root/
+# og runs as the image's non-root user and mounts $PWD at /work, so keep
+# bundles somewhere world-readable (not /root, which is 0700).
+ssh root@<droplet> 'mkdir -p /srv/omnigraph-bundles'
+scp -r ./my-bundle root@<droplet>:/srv/omnigraph-bundles/
 ssh root@<droplet>
-cd /root
+chmod -R a+rX /srv/omnigraph-bundles && cd /srv/omnigraph-bundles
 og cluster validate --config /work/my-bundle
 og cluster apply --target /var/lib/omnigraph/cluster --config /work/my-bundle --as act-you --json
 # apply exits holding the cluster admission lock; it printed the lock ID.
