@@ -50,7 +50,7 @@ resource "digitalocean_droplet" "this" {
   image      = var.droplet_image
   region     = var.region
   size       = var.size
-  ssh_keys   = [for key in digitalocean_ssh_key.this : key.fingerprint]
+  ssh_keys   = concat(var.ssh_key_fingerprints, [for key in digitalocean_ssh_key.this : key.fingerprint])
   volume_ids = [digitalocean_volume.data.id]
   ipv6       = true
   monitoring = true

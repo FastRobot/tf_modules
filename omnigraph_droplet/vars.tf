@@ -31,8 +31,15 @@ variable "volume_size_gb" {
 }
 
 variable "ssh_public_keys" {
-  description = "SSH public keys installed for root."
+  description = "SSH public keys to register in DigitalOcean and install for root. DigitalOcean refuses a key the account already holds; pass that one through ssh_key_fingerprints instead."
   type        = list(string)
+  default     = []
+}
+
+variable "ssh_key_fingerprints" {
+  description = "MD5 fingerprints (or IDs) of SSH keys already registered in the DigitalOcean account, installed for root."
+  type        = list(string)
+  default     = []
 }
 
 variable "ssh_source_addresses" {
