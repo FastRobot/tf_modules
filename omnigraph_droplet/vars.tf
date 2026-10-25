@@ -64,9 +64,9 @@ variable "tailscale_tags" {
 # --- containers ------------------------------------------------------------
 
 variable "omnigraph_image" {
-  description = "OmniGraph server image, pinned to a release tag."
+  description = "OmniGraph server image, pinned to a release tag. Docker Hub is the public pull channel; the GHCR copy needs registry_auth."
   type        = string
-  default     = "ghcr.io/modernrelay/omnigraph-server:v0.14.0"
+  default     = "docker.io/modernrelay/omnigraph-server:v0.14.0"
 }
 
 variable "registry_auth" {
